@@ -1,122 +1,146 @@
-# Contract Analysis Agent
+# Contract Analysis Tool
 
-An AI-powered contract analysis system that processes PDF and Word documents, extracts text, creates embeddings, and analyzes contracts using OpenAI's GPT-4 and knowledge base data.
+A Python application for analyzing and revising contracts based on company policies and knowledge stored in a PostgreSQL database.
 
-## Features
+## Project Overview
 
-- PDF and Word document processing
-- Text extraction and chunking
-- OpenAI embeddings generation
-- PostgreSQL with pgvector for vector similarity search
-- AI-powered contract analysis
-- RESTful API endpoint for document upload and analysis
+The Contract Analysis Tool helps you analyze contracts (in PDF or DOCX format) against your company's knowledge base to identify and revise clauses that conflict with company policies or interests.
 
-## Prerequisites
+### Key Features
 
-- Node.js (v16 or higher)
-- PostgreSQL (v12 or higher) with pgvector extension
+- Select PDF or DOCX contract files via a file explorer
+- Split contracts into meaningful chunks
+- Generate embeddings for each chunk using OpenAI's Embedding API
+- Query a PostgreSQL database with pgvector extension to find similar knowledge base entries
+- Revise contracts using OpenAI's GPT-4.1-nano model
+- Export revised contracts in the original format
+
+## Requirements
+
+- Python 3.8+
+- PostgreSQL database with pgvector extension
 - OpenAI API key
 
-## Setup
+## Installation
 
 1. Clone the repository:
-```bash
-git clone <repository-url>
-cd contract-analysis-agent
-```
+   ```
+   git clone https://github.com/yourusername/contract-analysis-tool.git
+   cd contract-analysis-tool
+   ```
 
-2. Install dependencies:
-```bash
-npm install
-```
+2. Create a virtual environment and activate it:
+   ```
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
 
-3. Create a PostgreSQL database and enable the pgvector extension:
+3. Install dependencies:
+   ```
+   pip install -r requirements.txt
+   ```
+
+4. Create a `.env` file in the root directory with the following environment variables:
+   ```
+   # OpenAI API credentials
+   OPENAI_API_KEY=your_openai_api_key_here
+   
+   # PostgreSQL database connection string
+   DATABASE_URL=postgresql://username:password@localhost:5432/database_name
+   
+   # Embedding settings
+   EMBEDDING_MODEL=text-embedding-3-small
+   
+   # Chat completion settings
+   CHAT_MODEL=gpt-4.1-nano
+   
+   # Chunking settings
+   CHUNK_SIZE=500
+   CHUNK_OVERLAP=50
+   ```
+
+## Database Setup
+
+The application requires a PostgreSQL database with the pgvector extension and a `knowledge_base` table with the following schema:
+
 ```sql
-CREATE DATABASE contract_analysis;
-\c contract_analysis
-CREATE EXTENSION vector;
-```
+CREATE EXTENSION IF NOT EXISTS vector;
 
-4. Create the knowledge_base table:
-```sql
 CREATE TABLE knowledge_base (
     id SERIAL PRIMARY KEY,
-    content TEXT NOT NULL,
-    embedding vector(1536),
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    fp VARCHAR,
+    chunk_index INTEGER,
+    content TEXT,
+    embedding VECTOR(1536),
+    meta_info VARCHAR,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE,
+    file_id INTEGER,
+    organization_id INTEGER,
+    is_knowledge_base BOOLEAN DEFAULT TRUE
 );
 ```
 
-5. Copy the environment file and update the variables:
-```bash
-cp .env.example .env
-```
+## Usage
 
-6. Update the `.env` file with your configuration:
-- Set your OpenAI API key
-- Configure your PostgreSQL connection string
-- Adjust other settings as needed
+1. Run the application:
+   ```
+   python main.py
+   ```
 
-7. Create the uploads directory:
-```bash
-mkdir uploads
-```
+2. Follow the on-screen prompts to:
+   - Select a contract file (PDF or DOCX)
+   - Process and analyze the contract
+   - Save the revised contract to a new file
 
-## Running the Application
+## System Prompt Customization
 
-Development mode:
-```bash
-npm run dev
-```
-
-Production mode:
-```bash
-npm run build
-npm start
-```
-
-## API Usage
-
-### Analyze Contract
-
-**Endpoint:** `POST /analyze-contract`
-
-**Request:**
-- Content-Type: multipart/form-data
-- Body: 
-  - `contract`: PDF or Word document file
-
-**Response:**
-```json
-{
-    "analysis": "Detailed contract analysis..."
-}
-```
+The system prompt used for contract revision can be customized by editing the `system_prompt.py` file. Modify the `SYSTEM_PROMPT` variable to adjust how the model revises contracts.
 
 ## Project Structure
 
 ```
-src/
-├── config/
-│   └── prompts.ts
-├── middleware/
-│   └── upload.ts
-├── services/
-│   └── contractProcessor.ts
+project/
+├── main.py              # Main application script
+├── system_prompt.py     # System prompt configuration
+├── requirements.txt     # Dependencies
+├── .env                 # Environment variables
 ├── utils/
-│   ├── embeddings.ts
-│   └── textChunker.ts
-└── index.ts
+│   ├── file_handler.py  # File reading and writing functions
+│   ├── chunker.py       # Text chunking functions
+│   ├── embedding.py     # Embedding generation functions
+│   ├── db.py            # Database connection and query functions
+│   └── api.py           # OpenAI API interaction functions
 ```
 
-## Contributing
+## Error Handling
 
-1. Fork the repository
-2. Create your feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a new Pull Request
+The application includes comprehensive error handling for:
+- File operations
+- Database connections
+- API rate limits
+- Invalid inputs
+
+Errors are logged to the console and appropriate user-friendly messages are displayed.
 
 ## License
 
-MIT 
+[MIT License](LICENSE)
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## Acknowledgements
+
+This project uses the following open-source libraries:
+- OpenAI API
+- PyPDF2
+- python-docx
+- psycopg2
+- pgvector
+- nltk
+- spacy
+- tkinter
+- reportlab
+- tqdm 
