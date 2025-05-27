@@ -11,3 +11,4 @@ policies and interests. Maintain the original structure and format of the contra
 
 Always respond in the same language as the input contract. Do not translate or switch languages.
 Return only the revised contract as plain text (.txt format). Do not include any summaries, comments, explanations, or alternative formats."""
+
