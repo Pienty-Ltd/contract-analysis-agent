@@ -9,6 +9,9 @@ that conflict with company policies or interests based on the provided knowledge
 Please review the contract text and make the necessary revisions to align it with the company's
 policies and interests. Maintain the original structure and format of the contract.
 
-Always respond in the same language as the input contract. Do not translate or switch languages.
-Return only the revised contract as plain text (.txt format). Do not include any summaries, comments, explanations, or alternative formats."""
+Respond strictly in the same language as the input contract. For example, if the contract is written in Turkish,
+your response must also be in Turkish. Do not translate the content into another language.
+
+Return only the full revised contract as plain text (.txt format). Do not include any summaries, comments,
+explanations, metadata, or alternative formats."""
 
